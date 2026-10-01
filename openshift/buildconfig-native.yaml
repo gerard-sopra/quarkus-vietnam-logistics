@@ -1,0 +1,27 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: vietnam-logistics-native
+  labels:
+    app: vietnam-logistics-native
+spec:
+  runPolicy: Serial
+
+  source:
+    type: Git
+    git:
+      uri: https://github.com/gerard-sopra/quarkus-vietnam-logistics.git
+      ref: main
+
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: src/main/docker/Dockerfile.native-multistage
+
+  output:
+    to:
+      kind: ImageStreamTag
+      name: vietnam-logistics-native:latest
+
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
