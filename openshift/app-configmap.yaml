@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: vietnam-logistics-native-config
+  labels:
+    app: vietnam-logistics-native
+
+data:
+  QUARKUS_DATASOURCE_JDBC_URL: "jdbc:postgresql://postgres:5432/vietnam_logistics"
+
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+
+  QUARKUS_ELASTICSEARCH_HOSTS: "elasticsearch:9200"

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: vietnam-logistics-native
+  labels:
+    app: vietnam-logistics-native
+
+spec:
+  selector:
+    app: vietnam-logistics-native
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+  type: ClusterIP

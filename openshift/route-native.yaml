@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+
+metadata:
+  name: vietnam-logistics-native
+  labels:
+    app: vietnam-logistics-native
+
+spec:
+  to:
+    kind: Service
+    name: vietnam-logistics-native
+
+  port:
+    targetPort: http
+
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

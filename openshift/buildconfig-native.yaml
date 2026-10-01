@@ -7,6 +7,14 @@ metadata:
 spec:
   runPolicy: Serial
 
+  resources:
+    requests:
+      cpu: "1"
+      memory: 4Gi
+    limits:
+      cpu: "2"
+      memory: 8Gi
+
   source:
     type: Git
     git:

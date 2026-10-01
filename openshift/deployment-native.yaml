@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: vietnam-logistics-native
+  labels:
+    app: vietnam-logistics-native
+
+  # Automatically update the Deployment when a new image is pushed
+  # to the vietnam-logistics-native:latest ImageStreamTag.
+  annotations:
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"vietnam-logistics-native:latest"},
+      "fieldPath":"spec.template.spec.containers[?(@.name==\"vietnam-logistics-native\")].image"}]
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: vietnam-logistics-native
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+
+  template:
+    metadata:
+      labels:
+        app: vietnam-logistics-native
+
+    spec:
+      containers:
+        - name: vietnam-logistics-native
+
+          # OpenShift will resolve/update this through the
+          # ImageStream trigger defined above.
+          image: vietnam-logistics-native:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          # Non-sensitive application configuration.
+          envFrom:
+            - configMapRef:
+                name: vietnam-logistics-native-config
+
+          # Sensitive configuration.
+          env:
+            - name: QUARKUS_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: vietnam-logistics-secret
+                  key: DB_USERNAME
+
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vietnam-logistics-secret
+                  key: DB_PASSWORD
+
+          # These are runtime resources for the native application.
+          # They are independent from the 2 CPU / 8 GiB used to
+          # compile the native executable.
+          resources:
+            requests:
+              cpu: "50m"
+              memory: 128Mi
+            limits:
+              cpu: "500m"
+              memory: 512Mi
+
+      restartPolicy: Always
