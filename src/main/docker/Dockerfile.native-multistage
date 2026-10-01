@@ -1,0 +1,35 @@
+# Stage 1: build the native executable
+FROM quay.io/quarkus/ubi9-quarkus-mandrel-builder-image:jdk-25 AS build
+
+WORKDIR /project
+
+COPY --chown=quarkus:quarkus . .
+
+USER quarkus
+
+RUN ./mvnw package \
+    -Dnative \
+    -DskipTests \
+    -Dquarkus.native.container-build=false
+
+
+# Stage 2: minimal runtime image
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7
+
+WORKDIR /work/
+
+RUN chown 1001 /work \
+    && chmod "g+rwX" /work \
+    && chown 1001:root /work
+
+COPY --from=build \
+    --chown=1001:root \
+    --chmod=0755 \
+    /project/target/*-runner \
+    /work/application
+
+EXPOSE 8080
+
+USER 1001
+
+ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]
